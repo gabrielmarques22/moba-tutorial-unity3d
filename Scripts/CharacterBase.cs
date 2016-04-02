@@ -7,14 +7,26 @@ public class CharacterBase : MonoBehaviour {
 	public string nome;
 	public int id, strenght, defense, inteligence, movementSpeed, lvl;
 	private int attack, magicalAttack, hpMax, manaMax, currentHP, currentMANA;
+    public GameObject selected;
+	private PhotonView photon;
 
 
 	// Use this for initialization
 	void Start () {
-	
+		photon = this.GetComponent<PhotonView>();
 	}
 
-	int CalculateAttack(int strenght){
+    public void SelectCharacter()
+    {
+        selected.SetActive(true);
+    }
+
+    public void UnselectCharacter()
+    {
+        selected.SetActive(false);
+    }
+
+    int CalculateAttack(int strenght){
 		return Random.Range(strenght - 2, strenght + 2);
 	}
 
@@ -52,7 +64,7 @@ public class CharacterBase : MonoBehaviour {
 	}
 
 	public void setCurrentMana(int mana){
-		currentHP = mana;
+		currentMANA = mana;
 	}
 
 	public int getCurrentHP(){
@@ -60,9 +72,16 @@ public class CharacterBase : MonoBehaviour {
 	}
 
 	public int getCurrentMana(){
-		return currentHP;
+		return currentMANA;
 	}
 
-
-
+	[PunRPC]
+	public void ApplyDamage(int attackValue){
+		if(photon.isMine){
+			int hp = getCurrentHP();
+			hp -= attackValue; 
+			//		Debug.Log("bateu " + attackValue);
+			this.setCurrentHP(hp);
+		}
+	}
 }
